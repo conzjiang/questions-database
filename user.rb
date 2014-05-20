@@ -6,39 +6,22 @@ class User < Question_Obj
     results.map { |result| User.new(result) }
   end
   
-  attr_accessor :id, :fname, :lname, :columns
+  attr_accessor :id, :fname, :lname
   
   def initialize(options = {})
     @id = options["id"]
     @fname = options["fname"]
     @lname = options["lname"]
-    @columns = [self.id, self.fname, self.lname]
+  end
+  
+  def columns
+    [@fname, @lname]
   end
   
   def table
     "users"
   end
 
-=begin  
-  def save
-    if self.id.nil?
-      QuestionsDatabase.instance.execute(<<-SQL, self.fname, self.lname)
-        INSERT INTO
-          users (fname, lname)
-        VALUES
-          (?, ?)
-      SQL
-    
-      @id = QuestionsDatabase.instance.last_insert_row_id
-    else
-      QuestionsDatabase.instance.execute(<<-SQL, self.fname, self.lname)
-        UPDATE users
-        SET fname = ?, lname = ?
-        WHERE users.id = ?
-      SQL
-    end
-  end
-=end  
   def self.find_by_id(id)
     results = QuestionsDatabase.instance.execute(<<-SQL, id)
       SELECT

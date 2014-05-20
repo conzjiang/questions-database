@@ -1,19 +1,27 @@
 require './question_requires.rb'
 
-class Reply
+class Reply < Question_Obj
   def self.all
     results = QuestionsDatabase.instance.execute('SELECT * FROM replies')
     results.map { |result| Reply.new(result) }
   end
   
-  attr_accessor :id, :body, :question_id, :parent_id, :user_id
+  attr_accessor :id, :body, :question_id, :user_id, :parent_reply
   
   def initialize(options = {})
     @id = options['id']
     @body = options['body']
     @question_id = options['question_id']
-    @parent_id = options['parent_id']
+    @parent_reply = options['parent_reply']
     @user_id = options['user_id']
+  end
+  
+  def columns
+    [@body, @question_id, @user_id, @parent_reply]
+  end
+  
+  def table
+    "replies"
   end
   
   def self.find_by_id(id)
@@ -81,7 +89,7 @@ class Reply
     results.map { |result| Question.new(result) }.first
   end
   
-  def parent_reply
+  def parentreply
     results = QuestionsDatabase.instance.execute(<<-SQL, self.parent_id)
       SELECT
         *

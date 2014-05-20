@@ -18,21 +18,16 @@ class Question_Obj
   end
   
   def ivars
-    self.instance_variables[1..-2].map { |v| v.to_s[1..-1] }.join(", ")
+    self.instance_variables[1..-1].map { |v| v.to_s[1..-1] }.join(", ")
   end
   
   def set
-    cols = self.instance_variables[1..-2].map { |v| v.to_s[1..-1] }
+    cols = self.instance_variables[1..-1].map { |v| v.to_s[1..-1] }
     cols.map { |col| "#{col} = ?" }.join(", ")
   end
   
-  def where
-    self.instance_variables[0].to_s[1..-1]
-  end
-  
   def save
-    *new_columns = self.columns[1..-1]
-    *update_columns = self.columns[1..-1] + [self.columns[0]]
+    *new_columns = self.columns
     
     if self.id.nil?
       QuestionsDatabase.instance.execute(<<-SQL, *new_columns)
@@ -44,7 +39,7 @@ class Question_Obj
     
       @id = QuestionsDatabase.instance.last_insert_row_id
     else
-      QuestionsDatabase.instance.execute(<<-SQL, *update_columns)
+      QuestionsDatabase.instance.execute(<<-SQL, *new_columns, self.id)
         UPDATE #{self.table}
         SET #{self.set}
         WHERE id = ?

@@ -1,6 +1,6 @@
 require './question_requires.rb'
 
-class Question
+class Question < Question_Obj
   def self.all
     results = QuestionsDatabase.instance.execute('SELECT * FROM questions')
     results.map { |result| Question.new(result) }
@@ -13,6 +13,10 @@ class Question
     @title = options['title']
     @body = options['body']
     @author_id = options['author_id']
+  end
+  
+  def columns
+    [@title, @body, @author_id]
   end
   
   def table
